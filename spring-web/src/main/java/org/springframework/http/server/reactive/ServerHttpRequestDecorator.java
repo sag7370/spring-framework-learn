@@ -109,6 +109,12 @@ public class ServerHttpRequestDecorator implements ServerHttpRequest {
 	}
 
 	@Override
+	@Nullable
+	public <T> T getNativeRequest() {
+		return this.delegate.getNativeRequest();
+	}
+
+	@Override
 	public Flux<DataBuffer> getBody() {
 		return getDelegate().getBody();
 	}
@@ -123,16 +129,13 @@ public class ServerHttpRequestDecorator implements ServerHttpRequest {
 	 * @since 5.3.3
 	 */
 	public static <T> T getNativeRequest(ServerHttpRequest request) {
-		if (request instanceof AbstractServerHttpRequest abstractServerHttpRequest) {
-			return abstractServerHttpRequest.getNativeRequest();
-		}
-		else if (request instanceof ServerHttpRequestDecorator serverHttpRequestDecorator) {
-			return getNativeRequest(serverHttpRequestDecorator.getDelegate());
-		}
-		else {
+		T nativeRequest = request.getNativeRequest();
+		if (nativeRequest == null) {
 			throw new IllegalArgumentException(
 					"Can't find native request in " + request.getClass().getName());
 		}
+
+		return nativeRequest;
 	}
 
 
